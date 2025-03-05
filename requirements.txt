@@ -1,0 +1,6 @@
+django
+djangorestframework
+djangorestframework-simplejwt
+celery
+psycopg2
+pipenv
