@@ -1,29 +1,18 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
-import { RouteRecordRaw } from 'vue-router';
-import HomePage from '../views/Home.vue';
-import AuthPage from '../views/Auth.vue';
-const routes: Array<RouteRecordRaw> = [
-  {
-    path: '/',
-    name: 'Home',
-    component: HomePage,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/auth',
-    name: 'Auth',
-    component: AuthPage
-  }
-];
+import Auth from "@/views/Auth.vue";
+import HomePage from "@/views/Main.vue";
+
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
-  routes
+  history: createWebHistory(),
+  routes: [
+    { path: '/auth',name:"Auth", component: Auth },
+    { path: '/home',name:"Home", component: HomePage},
+    { path: '/', redirect:"/auth",},
+    {
+      path: '/:catchAll(.*)',redirect:"/auth",
+    }
+  ],
+  strict:false,
 });
-router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth && !router.app.$store.state.isAuthenticated) {
-    next('/auth');
-  } else {
-    next();
-  }
-});
+
 export default router;
