@@ -6,45 +6,48 @@
           <ion-title>{{ isLogin ? 'Login' : 'Register' }}</ion-title>
         </ion-toolbar>
       </ion-header>
+      <ion-card>
+        <ion-card-content>
+          <ion-item>
+            <ion-label position="floating">Username</ion-label>
+            <ion-input v-model="username" required></ion-input>
+          </ion-item>
 
-      <ion-item>
-        <ion-label position="floating">Username</ion-label>
-        <ion-input v-model="username" required></ion-input>
-      </ion-item>
+          <ion-item>
+            <ion-label position="floating">Password</ion-label>
+            <ion-input type="password" v-model="password" required></ion-input>
+          </ion-item>
 
-      <ion-item>
-        <ion-label position="floating">Password</ion-label>
-        <ion-input type="password" v-model="password" required></ion-input>
-      </ion-item>
+          <!-- Email, First Name, and Last Name only for Register -->
+          <ion-item v-if="!isLogin">
+            <ion-label position="floating">Email</ion-label>
+            <ion-input v-model="email" type="email" required></ion-input>
+          </ion-item>
 
-      <!-- Email, First Name, and Last Name only for Register -->
-      <ion-item v-if="!isLogin">
-        <ion-label position="floating">Email</ion-label>
-        <ion-input v-model="email" type="email" required></ion-input>
-      </ion-item>
+          <ion-item v-if="!isLogin">
+            <ion-label position="floating">First Name</ion-label>
+            <ion-input v-model="firstName" required></ion-input>
+          </ion-item>
 
-      <ion-item v-if="!isLogin">
-        <ion-label position="floating">First Name</ion-label>
-        <ion-input v-model="firstName" required></ion-input>
-      </ion-item>
+          <ion-item v-if="!isLogin">
+            <ion-label position="floating">Last Name</ion-label>
+            <ion-input v-model="lastName" required></ion-input>
+          </ion-item>
 
-      <ion-item v-if="!isLogin">
-        <ion-label position="floating">Last Name</ion-label>
-        <ion-input v-model="lastName" required></ion-input>
-      </ion-item>
+          <!-- Submit Button -->
+          <ion-button expand="full" :disabled="isSubmitting" @click="handleSubmit">
+            {{ isLogin ? 'Login' : 'Register' }}
+          </ion-button>
 
-      <!-- Submit Button -->
-      <ion-button expand="full" :disabled="isSubmitting" @click="handleSubmit">
-        {{ isLogin ? 'Login' : 'Register' }}
-      </ion-button>
+          <!-- Switch between Login/Register -->
+          <ion-button expand="full" color="light" @click="toggleAuth">
+            {{ isLogin ? 'Switch to Register' : 'Switch to Login' }}
+          </ion-button>
 
-      <!-- Switch between Login/Register -->
-      <ion-button expand="full" color="light" @click="toggleAuth">
-        {{ isLogin ? 'Switch to Register' : 'Switch to Login' }}
-      </ion-button>
-
-      <!-- Display error message -->
-      <ion-text color="danger" v-if="error">{{ error }}</ion-text>
+          <!-- Display error message -->
+          <ion-text color="danger" v-if="error">{{ error }}</ion-text>          
+        </ion-card-content>
+      </ion-card>
     </ion-content>  
   </ion-page>
 
@@ -54,12 +57,12 @@
 import { defineComponent, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useIonRouter } from '@ionic/vue'; // Import the useIonRouter hook
-import { IonContent, IonHeader, IonToolbar, IonTitle, IonItem, IonLabel, IonInput, IonButton, IonText,IonPage } from '@ionic/vue';
+import { IonContent, IonHeader, IonToolbar, IonTitle, IonItem, IonLabel, IonInput, IonButton, IonText,IonPage, IonCard,IonCardContent } from '@ionic/vue';
 import { LoginRequest, RegisterRequest, model as authModel } from '../services/auth/auth.model';
 
 export default defineComponent({
   name: 'Auth',
-  components:{IonContent, IonHeader, IonToolbar, IonTitle, IonItem, IonLabel, IonInput, IonButton, IonText,IonPage},
+  components:{IonContent, IonHeader, IonToolbar, IonTitle, IonItem, IonLabel, IonInput, IonButton, IonText,IonPage,IonCard,IonCardContent},
   setup() {
     const store = useStore();
     const router = useIonRouter(); // Use the useIonRouter hook for navigation
