@@ -1,71 +1,109 @@
 <template>
   <ion-page>
-    <ion-content class="auth-container">
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>{{ isLogin ? 'Login' : 'Register' }}</ion-title>
-        </ion-toolbar>
-      </ion-header>
-      <ion-card>
-        <ion-card-content>
-          <ion-item>
-            <ion-label position="floating">Username</ion-label>
-            <ion-input v-model="username" required></ion-input>
-          </ion-item>
+    <ion-content>
+      <ion-grid class="full-height">    
+        <ion-row class="ion-align-items-center ion-justify-content-center full-height">
+          <ion-col></ion-col>
 
-          <ion-item>
-            <ion-label position="floating">Password</ion-label>
-            <ion-input type="password" v-model="password" required></ion-input>
-          </ion-item>
+          <ion-col size="12" size-md="6" size-lg="4">
+            <ion-card>
 
-          <!-- Email, First Name, and Last Name only for Register -->
-          <ion-item v-if="!isLogin">
-            <ion-label position="floating">Email</ion-label>
-            <ion-input v-model="email" type="email" required></ion-input>
-          </ion-item>
+              <ion-card-header>
+                <ion-card-title color="primary">   
+                  <h1>
+                    {{ isLogin ? 'Welcome back' : 'Sign up' }}
+                  </h1>
+                </ion-card-title>
+                <ion-card-subtitle>
+                  {{ isLogin ? 'Sign in to your account' : '' }}
+                </ion-card-subtitle>
+              </ion-card-header>
 
-          <ion-item v-if="!isLogin">
-            <ion-label position="floating">First Name</ion-label>
-            <ion-input v-model="firstName" required></ion-input>
-          </ion-item>
+              <ion-card-content>       
+                    <ion-row v-if="!isLogin">
+                      <ion-col style="padding-left:0;">
+                        <ion-input shape="round" fill="outline" label-placement="floating" label="First Name" v-model="firstName" required></ion-input>
+                      </ion-col>
+                      <ion-col style="padding-right:0;">
+                        <ion-input shape="round" fill="outline" label-placement="floating" label="Last Name" v-model="lastName" required></ion-input>
+                      </ion-col>
+                    </ion-row>
+                    <br v-if="!isLogin"/>
+                    <ion-input shape="round" v-if="!isLogin" fill="outline" label-placement="floating" label="Email" v-model="email" type="email" required></ion-input>
+                    <br/> 
+                    <ion-input shape="round" fill="outline" label-placement="floating" label="Username" v-model="username" required></ion-input>
+                    <br/> 
+                    <ion-input shape="round" fill="outline" label-placement="floating" label="Password" type="password" v-model="password" required :error-text="error"></ion-input>
+                    <br/> 
 
-          <ion-item v-if="!isLogin">
-            <ion-label position="floating">Last Name</ion-label>
-            <ion-input v-model="lastName" required></ion-input>
-          </ion-item>
+                    <ion-button size="large" shape="round" expand="full" :disabled="isSubmitting" @click="handleSubmit">
+                      Continue
+                    </ion-button>
+                    <br/> 
+                    <!-- <ion-text color="danger" v-if="error" class="ion-text-center">{{ error }}</ion-text> -->
 
-          <!-- Submit Button -->
-          <ion-button expand="full" :disabled="isSubmitting" @click="handleSubmit">
-            {{ isLogin ? 'Login' : 'Register' }}
-          </ion-button>
+                    <div class="align-items">
+                      <ion-text>{{ isLogin ? "Don't have an account? " : 'Already a member? ' }}</ion-text>
+                      <ion-button size="small" shape="round" @click="toggleAuth" fill="clear">
+                        {{ isLogin ? 'Sign up' : 'Login' }}
+                      </ion-button>
+                    </div>   
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
 
-          <!-- Switch between Login/Register -->
-          <ion-button expand="full" color="light" @click="toggleAuth">
-            {{ isLogin ? 'Switch to Register' : 'Switch to Login' }}
-          </ion-button>
-
-          <!-- Display error message -->
-          <ion-text color="danger" v-if="error">{{ error }}</ion-text>          
-        </ion-card-content>
-      </ion-card>
-    </ion-content>  
+          <ion-col></ion-col>
+        </ion-row> 
+      </ion-grid>
+    </ion-content>
   </ion-page>
-
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { useStore } from 'vuex';
-import { useIonRouter } from '@ionic/vue'; // Import the useIonRouter hook
-import { IonContent, IonHeader, IonToolbar, IonTitle, IonItem, IonLabel, IonInput, IonButton, IonText,IonPage, IonCard,IonCardContent } from '@ionic/vue';
+import { useIonRouter } from '@ionic/vue';
+import {
+  IonContent,
+  IonPage,
+  IonInput,
+  IonButton,
+  IonText,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardSubtitle,
+  IonItem,
+  IonList,
+} from '@ionic/vue';
 import { LoginRequest, RegisterRequest, model as authModel } from '../services/auth/auth.model';
 
 export default defineComponent({
   name: 'Auth',
-  components:{IonContent, IonHeader, IonToolbar, IonTitle, IonItem, IonLabel, IonInput, IonButton, IonText,IonPage,IonCard,IonCardContent},
+  components: {
+    IonContent,
+    IonPage,
+    IonInput,
+    IonButton,
+    IonText,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonCard,
+    IonCardContent,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardSubtitle,
+    IonItem,
+    IonList,
+  },
   setup() {
     const store = useStore();
-    const router = useIonRouter(); // Use the useIonRouter hook for navigation
+    const router = useIonRouter();
 
     const username = ref('');
     const password = ref('');
@@ -74,12 +112,11 @@ export default defineComponent({
     const lastName = ref('');
     const isLogin = ref(true);
     const error = ref('');
-    const isSubmitting = ref(false); // Used to disable button during form submission
+    const isSubmitting = ref(false);
 
-    // Handle form submission (login or register)
     const handleSubmit = async () => {
       error.value = '';
-      isSubmitting.value = true; // Disable submit button during submission
+      isSubmitting.value = true;
 
       try {
         let response;
@@ -92,7 +129,7 @@ export default defineComponent({
             password: password.value,
             email: email.value,
             firstName: firstName.value,
-            lastName: lastName.value
+            lastName: lastName.value,
           };
           response = await authModel.api.register(registerData);
         }
@@ -100,17 +137,14 @@ export default defineComponent({
         store.commit('setAuth', true);
         store.commit('setUser', response.user);
 
-        // Navigate to a new page after login/register is successful
-        router.push('/home'); // You can change '/home' to whatever route you want
-
+        router.push('/home');
       } catch (e) {
         error.value = e instanceof Error ? e.message : 'An error occurred';
       } finally {
-        isSubmitting.value = false; // Re-enable button after submission
+        isSubmitting.value = false;
       }
     };
 
-    // Toggle between login and register forms
     const toggleAuth = () => {
       isLogin.value = !isLogin.value;
       username.value = '';
@@ -121,24 +155,43 @@ export default defineComponent({
       error.value = '';
     };
 
-    return { 
-      username, password, email, firstName, lastName, isLogin, isSubmitting, handleSubmit, toggleAuth, error 
+    return {
+      username,
+      password,
+      email,
+      firstName,
+      lastName,
+      isLogin,
+      isSubmitting,
+      handleSubmit,
+      toggleAuth,
+      error,
     };
-  }
+  },
 });
 </script>
 
 <style scoped>
-.auth-container {
-  padding: 16px;
+.align-items {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
-ion-button[disabled] {
-  opacity: 0.5;
+h1 {
+  margin: 0;
+  font-size: 36px;
 }
-
-ion-page {
-  width:100%;
-  height:100%;
+.full-height {
+  height: 100%;
+}
+ion-card {
+  background-color: var(--ion-card-background-color); 
+  padding: 10px;
+}
+ion-col {
+ margin: auto;
+}
+ion-card-title , ion-card-subtitle {
+  text-align: center;
 }
 </style>
