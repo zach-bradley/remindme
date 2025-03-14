@@ -4,33 +4,20 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
-            "name": "Python: Django",
+            "name": "FastAPI: Uvicorn",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/server/manage.py",
+            "module": "uvicorn",
             "args": [
-                "runserver",
+              "remindme.main:app",
+              "--host", "127.0.0.1",
+              "--port", "8000",
+              "--reload"
             ],
-            "django": true
-        },
-        {
-            "name": "Python: Django Cron Process Tasks",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/server/manage.py",
-            "args": [
-              "process_tasks"
-            ],
-            "django": true
+            "cwd": "${workspaceFolder}/server",
+            "console": "integratedTerminal",
+            "preLaunchTask": "Start Redis",
           },
-        {
-            "name": "Python: Current File",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal"
-        }
     ]
 }

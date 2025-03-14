@@ -4,15 +4,19 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "*"
-djangorestframework = "*"
-djangorestframework-simplejwt = "*"
-celery = "*"
-psycopg2 = "*"
-python-dotenv = "*"
-django-extensions = "*"
+fastapi = "*"
+uvicorn = "*"
+strawberry-graphql = {extras = ["fastapi"], version = "*"}
+sqlalchemy = "*"
+psycopg2-binary = "*"
+werkzeug = "*"
+pydantic = {extras = ["email"], version = "*"}
+pyjwt = "*"
+passlib = {extras = ["bcrypt"], version = "*"}
+redis = "*"
+pydantic-settings = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.10"
+python_version = "3.9"
