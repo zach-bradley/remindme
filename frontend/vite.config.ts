@@ -13,7 +13,11 @@ export default defineConfig({
     },
   },
   server: {
-    port: 8100,
+    proxy: {
+      '/api': 'http://localhost:8000',
+      '/graphql': 'http://localhost:8000',
+    },
+    port: 8000
   },
   test: {
     globals: true,

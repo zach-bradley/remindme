@@ -40,6 +40,11 @@ class UserInput:
     last_name: typing.Optional[str] = None
 
 @strawberry.input
+class UserLoginInput:
+    email: str
+    password: str
+
+@strawberry.input
 class UserUpdateInput:
     id: strawberry.ID
     first_name: typing.Optional[str] = None

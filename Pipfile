@@ -12,11 +12,13 @@ psycopg2-binary = "*"
 werkzeug = "*"
 pydantic = {extras = ["email"], version = "*"}
 pyjwt = "*"
-passlib = {extras = ["bcrypt"], version = "*"}
 redis = "*"
 pydantic-settings = "*"
+bcrypt = "*"
+cryptography = "*"
+passlib = {extras = ["bcrypt"], version = "*"}
 
 [dev-packages]
 
 [requires]
-python_version = "3.9"
+python_version = "3.10"

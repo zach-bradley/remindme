@@ -1,8 +1,9 @@
 
 import { LoginRequest, RegisterRequest, AuthResponse } from './auth.model';
+import {mutationBase} from '../../graphql/mutation'
 
 export class AuthApi {
-    private baseUrl = '/api';
+    private baseUrl = "/graphql";
     private token: string | null = null;
 
     private async handleResponse(response: Response) {
@@ -28,10 +29,19 @@ export class AuthApi {
     }
 
     async login(request: LoginRequest): Promise<AuthResponse> {
-        const response = await fetch(`${this.baseUrl}/login`, {
+        const loginMutation = mutationBase(
+            "login",
+            ["accessToken", "refreshToken"],
+            { email: "String!", password: "String!" },  // Define expected GraphQL types
+            "login"
+        );    
+        const response = await fetch(`${this.baseUrl}`, {
             method: 'POST',
             headers: this.getHeaders(),
-            body: JSON.stringify(request)
+            body: JSON.stringify({
+                query: loginMutation,
+                variables: { email: request.email, password: request.password }
+            })
         });
         const data = await this.handleResponse(response);
         this.setToken(data.token);

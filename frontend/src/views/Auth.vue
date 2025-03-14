@@ -29,9 +29,7 @@
                       </ion-col>
                     </ion-row>
                     <br v-if="!isLogin"/>
-                    <ion-input shape="round" v-if="!isLogin" fill="outline" label-placement="floating" label="Email" v-model="email" type="email" required></ion-input>
-                    <br/> 
-                    <ion-input shape="round" fill="outline" label-placement="floating" label="Username" v-model="username" required></ion-input>
+                    <ion-input shape="round" fill="outline" label-placement="floating" label="Email" v-model="email" type="email" required></ion-input>
                     <br/> 
                     <ion-input shape="round" fill="outline" label-placement="floating" label="Password" type="password" v-model="password" required :error-text="error"></ion-input>
                     <br/> 
@@ -105,7 +103,6 @@ export default defineComponent({
     const store = useStore();
     const router = useIonRouter();
 
-    const username = ref('');
     const password = ref('');
     const email = ref('');
     const firstName = ref('');
@@ -121,11 +118,10 @@ export default defineComponent({
       try {
         let response;
         if (isLogin.value) {
-          const loginData: LoginRequest = { username: username.value, password: password.value };
+          const loginData: LoginRequest = { email: email.value, password: password.value };
           response = await authModel.api.login(loginData);
         } else {
           const registerData: RegisterRequest = {
-            username: username.value,
             password: password.value,
             email: email.value,
             firstName: firstName.value,
@@ -147,7 +143,6 @@ export default defineComponent({
 
     const toggleAuth = () => {
       isLogin.value = !isLogin.value;
-      username.value = '';
       password.value = '';
       email.value = '';
       firstName.value = '';
@@ -156,7 +151,6 @@ export default defineComponent({
     };
 
     return {
-      username,
       password,
       email,
       firstName,
