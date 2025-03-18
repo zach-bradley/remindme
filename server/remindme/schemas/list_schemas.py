@@ -1,18 +1,24 @@
 from pydantic import BaseModel
 from uuid import UUID
 
-class Item(BaseModel):
+class ItemBase(BaseModel):
     name = str
     quantity = int
+
+class ItemCreate(ItemBase):
     checked = bool
-    list_id = int
+    list_id = UUID
+
+class ClientItem(ItemCreate):
+    id = UUID
 
 class ListBase(BaseModel):
-    id = UUID
     name = str
     store = str
-    items = [Item]
-    user_id: UUID
 
-    class Config:
-        from_attributes = True
+class ListCreate(ListBase):
+    items = [ItemBase]
+    user_id: UUID    
+
+class ClientList(ListCreate):
+    id = UUID

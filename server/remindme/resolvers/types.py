@@ -33,7 +33,6 @@ class ListType:
 # Inputs
 @strawberry.input
 class UserInput:
-    id: strawberry.ID
     email: str
     password: str
     first_name: typing.Optional[str] = None
