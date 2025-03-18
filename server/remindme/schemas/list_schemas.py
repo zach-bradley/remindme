@@ -18,7 +18,7 @@ class ListBase(BaseModel):
     store: str
 
 class ListCreate(ListBase):
-    items: List[ItemBase]
+    items: List[ItemBase] = []
     user_id: UUID    
 
 class ClientList(ListCreate):

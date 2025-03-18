@@ -42,7 +42,7 @@ class ListMutation:
     @strawberry.mutation
     def create_list(self, list_data: ListInput, info: strawberry.Info) -> ListType:
         db = info.context.db
-        return ListResolvers.create_list(list_data, db)
+        return ListResolvers.create_list(user_id=info.context.user.id,list_data=list_data, db=db)
     
     @strawberry.mutation
     def update_list(self, id: UUID, list_data: ListInput, info: strawberry.Info) -> Optional[ListType]:

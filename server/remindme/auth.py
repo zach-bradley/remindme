@@ -1,5 +1,6 @@
 import json
 import jwt
+import uuid
 from datetime import datetime, timedelta,timezone
 from passlib.context import CryptContext
 from .config import settings
@@ -67,24 +68,27 @@ def verify_jwt_token(token: str, db: Session, redis_client) -> Optional[User]:
         if token.startswith("Bearer "):
             token = token.split("Bearer ")[1]  # Remove "Bearer " prefix
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_email: str = payload.get("sub")
-        
-        if user_email is None:
+        user_id: str = payload.get("sub")
+        print(user_id)
+        if user_id is None:
             raise HTTPException(status_code=401, detail="Token is invalid or expired")
         
         # Check the cache for the user
-        cached_user = get_user_cache(redis_client, user_email)
+        cached_user = get_user_cache(redis_client, user_id)
+        print(cached_user)
         if cached_user:
             # If user is found in cache, return the cached user
             return cached_user
         
         # If user is not in the cache, retrieve from the database
-        user = db.query(User).filter(User.email == user_email).first()
+        print(uuid.UUID(user_id))
+        user = db.query(User).filter(User.id == uuid.UUID(user_id)).first()
+        print(user)
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
         
         # Cache the user data for future requests
-        set_user_cache(redis_client, user_email, serialize_user(user))
+        set_user_cache(redis_client, user_id, serialize_user(user))
         
         return user
     except jwt.ExpiredSignatureError:
@@ -102,13 +106,13 @@ def serialize_user(user: User) -> dict:
         "last_name": user.last_name,
     }
 
-def set_user_cache(redis_client, user_email: str, user_data: dict):
+def set_user_cache(redis_client, user_id: str, user_data: dict):
     """Store the serialized user data in Redis."""
-    redis_client.setex(user_email, 3600, json.dumps(user_data))  # Cache for 1 hour
+    redis_client.setex(user_id, 3600, json.dumps(user_data))  # Cache for 1 hour
 
-def get_user_cache(redis_client, user_email: str) -> Optional[User]:
+def get_user_cache(redis_client, user_id: str) -> Optional[User]:
     """Retrieve the user from the Redis cache and deserialize it."""
-    cached_user = redis_client.get(user_email)
+    cached_user = redis_client.get(user_id)
     if cached_user:
         user_data = json.loads(cached_user)
         return deserialize_user(user_data)

@@ -25,7 +25,6 @@ class UserResolvers:
     def create_user(userData: UserInput, db: Session) -> UserType:
         user_manager = UserManager(db)
         user_dict = userData.__dict__.copy()
-        print(user_dict)
         db_user = user_manager.create_user(user_dict)
         return db_user
     
