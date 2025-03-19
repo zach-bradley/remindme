@@ -25,4 +25,4 @@ export interface Item {
 export interface ItemInput {
     title: string;
     quantity: number;
-} 
+}

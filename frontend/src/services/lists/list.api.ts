@@ -28,11 +28,52 @@ export class ListApi {
         return headers;
     }
 
-    // List operations
+    async getList(id: string): Promise<List> {
+        const getListQuery = queryBase(
+            "getList",
+            "list",
+            ["id", "name", "place", "userId", "items { id name quantity checked }"],
+            { id: "UUID!" }
+        );
+
+        const response = await fetch(this.baseUrl, {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify({
+                query: getListQuery,
+                variables: { id }
+            })
+        });
+
+        const data = await this.handleResponse(response);
+        return data.data.list;
+    }
+
+    async getLists(userId: string): Promise<List[]> {
+        const getListsQuery = queryBase(
+            "getLists",
+            "lists",
+            ["id", "name", "place", "userId", "items { id name quantity checked }"],
+            { user_id: "String!" }
+        );
+
+        const response = await fetch(this.baseUrl, {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify({
+                query: getListsQuery,
+                variables: { user_id: userId }
+            })
+        });
+
+        const data = await this.handleResponse(response);
+        return data.data.lists;
+    }
+
     async createList(request: ListInput): Promise<List> {
         const createListMutation = mutationBase(
             "createList",
-            ["id", "title", "description", "userId", "items { id title quantity checked createdAt updatedAt }", "createdAt", "updatedAt"],
+            ["id", "name", "store", "userId", "items { id name quantity checked}"],
             { list_data: "ListInput!" },
             "createList"
         );
@@ -53,7 +94,7 @@ export class ListApi {
     async updateList(id: string, request: ListInput): Promise<List> {
         const updateListMutation = mutationBase(
             "updateList",
-            ["id", "title", "description", "userId", "items { id title quantity checked createdAt updatedAt }", "createdAt", "updatedAt"],
+            ["id", "name", "store", "userId", "items { id name quantity checked }"],
             { id: "UUID!", list_data: "ListInput!" },
             "updateList"
         );
@@ -92,53 +133,11 @@ export class ListApi {
         return data.data.deleteList;
     }
 
-    async getList(id: string): Promise<List> {
-        const getListQuery = queryBase(
-            "getList",
-            "list",
-            ["id", "title", "description", "userId", "items { id title quantity checked createdAt updatedAt }", "createdAt", "updatedAt"],
-            { id: "UUID!" }
-        );
-
-        const response = await fetch(this.baseUrl, {
-            method: 'POST',
-            headers: this.getHeaders(),
-            body: JSON.stringify({
-                query: getListQuery,
-                variables: { id }
-            })
-        });
-
-        const data = await this.handleResponse(response);
-        return data.data.list;
-    }
-
-    async getLists(userId: string): Promise<List[]> {
-        const getListsQuery = queryBase(
-            "getLists",
-            "lists",
-            ["id", "title", "description", "userId", "items { id title quantity checked createdAt updatedAt }", "createdAt", "updatedAt"],
-            { user_id: "String!" }
-        );
-
-        const response = await fetch(this.baseUrl, {
-            method: 'POST',
-            headers: this.getHeaders(),
-            body: JSON.stringify({
-                query: getListsQuery,
-                variables: { user_id: userId }
-            })
-        });
-
-        const data = await this.handleResponse(response);
-        return data.data.lists;
-    }
-
     // Item operations
     async createItem(listId: string, request: ItemInput): Promise<Item> {
         const createItemMutation = mutationBase(
             "createItem",
-            ["id", "title", "quantity", "checked", "createdAt", "updatedAt"],
+            ["id", "name", "quantity", "checked"],
             { list_id: "UUID!", item_data: "ItemInput!" },
             "createItem"
         );
@@ -159,7 +158,7 @@ export class ListApi {
     async updateItem(id: string, request: ItemInput): Promise<Item> {
         const updateItemMutation = mutationBase(
             "updateItem",
-            ["id", "title", "quantity", "checked", "createdAt", "updatedAt"],
+            ["id", "name", "quantity", "checked"],
             { id: "UUID!", item_data: "ItemInput!" },
             "updateItem"
         );
@@ -201,7 +200,7 @@ export class ListApi {
     async toggleItemChecked(id: string): Promise<Item> {
         const toggleCheckedMutation = mutationBase(
             "toggleItemChecked",
-            ["id", "title", "quantity", "checked", "createdAt", "updatedAt"],
+            ["id", "name", "quantity", "checked"],
             { id: "UUID!" },
             "toggleItemChecked"
         );
