@@ -9,14 +9,14 @@ from .types import UserType, UserInput, TokenResponse,ListType, ListInput, ItemT
 @strawberry.type
 class UserMutation:
     @strawberry.mutation
-    def create_user(self, user_data: UserInput, info: strawberry.Info) -> UserType:
+    def create_user(self, userData: UserInput, info: strawberry.Info) -> UserType:
         db = info.context.db
-        return UserResolvers.create_user(user_data, db)
+        return UserResolvers.create_user(userData, db)
     
     @strawberry.mutation
-    def update_user(self, user_data: UserUpdateInput,info:strawberry.Info) -> UserType:
+    def update_user(self, userData: UserUpdateInput,info:strawberry.Info) -> UserType:
         db = info.context.db
-        return UserResolvers.update_user(user_data,db)
+        return UserResolvers.update_user(userData,db)
     
     @strawberry.mutation
     def login(self, email: str, password: str, info: strawberry.Info) -> TokenResponse:
@@ -42,7 +42,7 @@ class ListMutation:
     @strawberry.mutation
     def create_list(self, list_data: ListInput, info: strawberry.Info) -> ListType:
         db = info.context.db
-        return ListResolvers.create_list(list_data, db)
+        return ListResolvers.create_list(user_id=info.context.user.id,list_data=list_data, db=db)
     
     @strawberry.mutation
     def update_list(self, id: UUID, list_data: ListInput, info: strawberry.Info) -> Optional[ListType]:

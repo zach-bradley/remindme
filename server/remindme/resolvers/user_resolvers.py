@@ -22,9 +22,9 @@ class UserResolvers:
         return [UserType(**user.client_dict()) for user in users]
 
     @staticmethod
-    def create_user(user_data: UserInput, db: Session) -> UserType:
+    def create_user(userData: UserInput, db: Session) -> UserType:
         user_manager = UserManager(db)
-        user_dict = user_data.__dict__.copy()
+        user_dict = userData.__dict__.copy()
         db_user = user_manager.create_user(user_dict)
         return db_user
     

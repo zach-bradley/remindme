@@ -1,8 +1,9 @@
 from typing import Optional, List as PyList
 from uuid import UUID
 from sqlalchemy.orm import Session
-from ..models.lists import List as ListModel, Item as ItemModel
+from ..models.lists import List as ListModel, Item as ItemModel, ListManager
 from .types import ListType, ListInput, ItemType, ItemInput
+from ..schemas.list_schemas import ListCreate
 
 class ListResolvers:
     @staticmethod
@@ -17,14 +18,13 @@ class ListResolvers:
         return ListModel.get_by_user(db, user_id)
     
     @staticmethod
-    def create_list(list_data: ListInput, db: Session) -> ListType:
+    def create_list(user_id: UUID, list_data: ListInput, db: Session) -> ListType:
+        list_manager = ListManager(db)
         list_dict = list_data.__dict__.copy()
-        db_list = ListModel(**list_dict)
-        db.add(db_list)
-        db.commit()
-        db.refresh(db_list)
-        
-        return ListType(**db_list.client_dict())
+        list_dict["user_id"] = user_id
+        validated_data = ListCreate(**list_dict)
+        db_list = list_manager.create(validated_data)
+        return db_list
     
     @staticmethod
     def update_list(id: UUID, list_data: ListInput, db: Session) -> Optional[ListType]:

@@ -1,5 +1,4 @@
 from .util import TimeStampModel
-from fastapi import HTTPException
 from sqlalchemy import Column, String
 from pydantic import ValidationError
 from ..schemas.user_schemas import UserCreate, UserUpdate
@@ -31,7 +30,6 @@ class User(TimeStampModel):
 
 class UserManager(BaseManager):
     def __init__(self, db:Session):
-        # Initialize with the UserModel
         super().__init__(User, db)
 
     def serialize_user(self, user: User) -> UserType:
@@ -64,8 +62,7 @@ class UserManager(BaseManager):
         """
         Update user details securely and refresh the session user.
         """
-        from ..auth import verify_password, get_password_hash, set_user_cache
-
+        from ..auth import set_user_cache
         if update_data.email and update_data.email != user.email:
             existing_user = self.db.query(User).filter(User.email == update_data.email).first()
             if existing_user:
@@ -73,17 +70,11 @@ class UserManager(BaseManager):
 
         for field, value in update_data.model_dump(exclude_unset=True).items():
             setattr(user, field, value)
-
         self.db.commit()
         self.db.refresh(user)
-
-        # Update Redis Cache
         set_user_cache(redis_client, user.email, user.client_dict())
-
-        # Return updated user
         return self.serialize_user(user)
     
-    @staticmethod
     def create_user(self, user_data):
         from ..auth import get_password_hash
         user_data["password"] = get_password_hash(user_data.get("password"))
