@@ -1,24 +1,24 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-      {
-        "label": "Start Redis",
-        "type": "shell",
-        "command": "if ! docker ps -q -f name=redis; then docker run --name redis -p 6379:6379 -d redis; else echo 'Redis container already running.'; fi",
-        "problemMatcher": [],
-        "group": {
-          "kind": "build",
-          "isDefault": true
-        },
-        "detail": "Starts Redis using Docker"
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start Redis",
+      "type": "shell",
+      "command": "if ! docker ps -q -f name=redis; then docker run --name redis -p 6379:6379 -d redis; else echo 'Redis container already running.'; fi",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
       },
-      {
-        "label": "Stop Redis",
-        "type": "shell",
-        "command": "docker stop redis && docker rm redis",
-        "problemMatcher": [],
-        "group": "none",
-        "detail": "Stops Redis container"
-      }
-    ]
-  }
+      "detail": "Starts Redis using Docker"
+    },
+    {
+      "label": "Stop Redis",
+      "type": "shell",
+      "command": "docker stop redis && docker rm redis",
+      "problemMatcher": [],
+      "group": "none",
+      "detail": "Stops Redis container"
+    }
+  ]
+}
