@@ -10,7 +10,6 @@ class TokenResponse:
 
 @strawberry.type
 class UserType:
-    id: strawberry.ID
     email: str
     first_name: typing.Optional[str] = None
     last_name: typing.Optional[str] = None    
