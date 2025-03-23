@@ -17,6 +17,7 @@ pydantic-settings = "*"
 bcrypt = "*"
 cryptography = "*"
 passlib = {extras = ["bcrypt"], version = "*"}
+celery = {extras = ["redis"], version = "*"}
 
 [dev-packages]
 
