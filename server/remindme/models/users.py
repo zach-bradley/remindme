@@ -1,9 +1,11 @@
+import uuid
 from .util import TimeStampModel
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, Float,ForeignKey
+from sqlalchemy.dialects.postgresql import UUID
 from pydantic import ValidationError
 from ..schemas.user_schemas import UserCreate, UserUpdate
 from typing import Optional
-from sqlalchemy.orm import relationship, Session
+from sqlalchemy.orm import relationship, Session, backref
 from ..database import Base, BaseManager
 from ..utils import model_to_dict
 from ..resolvers.types import UserType
@@ -16,7 +18,8 @@ class User(TimeStampModel):
     email = Column(String(100), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
 
-    lists = relationship("List", back_populates="user")
+    lists = relationship("List", back_populates="user", cascade="all, delete-orphan", passive_deletes=True)
+    location = relationship("UserLocation", back_populates="user", uselist=False, cascade="all, delete-orphan", passive_deletes=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['email', 'password']
@@ -26,6 +29,17 @@ class User(TimeStampModel):
     
     def client_dict(self):
         return model_to_dict(self,UserType)
+    
+class UserLocation(Base):
+    __tablename__ = "user_locations"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    user_id = Column(UUID, ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
+    latitude = Column(Float, nullable=False,default=0.00)
+    longitude = Column(Float, nullable=False, default=0.00)
+
+    user = relationship('User', back_populates="location")
+
     
 
 class UserManager(BaseManager):

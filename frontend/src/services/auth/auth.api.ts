@@ -49,10 +49,19 @@ export class AuthApi {
     }
 
     async register(request: RegisterRequest): Promise<AuthResponse> {
-        const response = await fetch(`${this.baseUrl}/register`, {
+        const registerMutation = mutationBase(
+            "register",
+            ["email", "firstName", "lastName"],
+            { userData: "UserInput!" },
+            "register"
+        );
+        const response = await fetch(`${this.baseUrl}`, {
             method: 'POST',
             headers: this.getHeaders(),
-            body: JSON.stringify(request)
+            body: JSON.stringify({
+                query: registerMutation,
+                variables: { userData: {email: request.email, password: request.password,firstName:request.firstName,lastName:request.lastName }}
+            })
         });
         const data = await this.handleResponse(response);
         this.setToken(data.token);

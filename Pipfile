@@ -18,6 +18,7 @@ bcrypt = "*"
 cryptography = "*"
 passlib = {extras = ["bcrypt"], version = "*"}
 celery = {extras = ["redis"], version = "*"}
+alembic = "*"
 
 [dev-packages]
 

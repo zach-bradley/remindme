@@ -12,9 +12,9 @@ class List(TimeStampModel):
 
     name = Column(String, index=True)
     store = Column(String)
-    user_id = Column(UUID, ForeignKey('users.id'), nullable=False)
+    user_id = Column(UUID, ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
 
-    items = relationship("Item", back_populates="list", cascade="all, delete-orphan")
+    items = relationship("Item", back_populates="list", cascade="all,delete-orphan", passive_deletes=True)
     user = relationship("User", back_populates="lists")
 
     @classmethod
@@ -30,7 +30,7 @@ class Item(TimeStampModel):
     name = Column(String, index=True)
     quantity = Column(Integer, default=1)
     checked = Column(Boolean, default=False)
-    list_id = Column(UUID, ForeignKey('lists.id'), nullable=False)
+    list_id = Column(UUID, ForeignKey('lists.id', ondelete="CASCADE"), nullable=False)
     list = relationship("List", back_populates="items")
 
     def client_dict(self):

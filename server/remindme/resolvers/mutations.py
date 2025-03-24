@@ -9,7 +9,7 @@ from .types import UserType, UserInput, TokenResponse,ListType, ListInput, ItemT
 @strawberry.type
 class UserMutation:
     @strawberry.mutation
-    def create_user(self, userData: UserInput, info: strawberry.Info) -> UserType:
+    def register(self, userData: UserInput, info: strawberry.Info) -> UserType:
         db = info.context.db
         return UserResolvers.create_user(userData, db)
     
