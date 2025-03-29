@@ -37,6 +37,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+    volumes:
+      - ../../server:/app/server
     networks:
       - backend
     env_file:

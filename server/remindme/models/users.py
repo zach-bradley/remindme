@@ -3,12 +3,13 @@ from .util import TimeStampModel
 from sqlalchemy import Column, String, Float,ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from pydantic import ValidationError
-from ..schemas.user_schemas import UserCreate, UserUpdate
+from ..schemas.user_schemas import UserCreate, UserUpdate, LocationUpdate
 from typing import Optional
-from sqlalchemy.orm import relationship, Session, backref
+from sqlalchemy.orm import relationship, Session
 from ..database import Base, BaseManager
 from ..utils import model_to_dict
-from ..resolvers.types import UserType
+from ..resolvers.types import UserType,UserLocationType
+from .lists import List
 
 class User(TimeStampModel):
     __tablename__ = 'users'
@@ -18,7 +19,7 @@ class User(TimeStampModel):
     email = Column(String(100), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
 
-    lists = relationship("List", back_populates="user", cascade="all, delete-orphan", passive_deletes=True)
+    lists = relationship(List, back_populates="user", cascade="all, delete-orphan", passive_deletes=True)
     location = relationship("UserLocation", back_populates="user", uselist=False, cascade="all, delete-orphan", passive_deletes=True)
 
     USERNAME_FIELD = 'email'
@@ -28,7 +29,9 @@ class User(TimeStampModel):
         return f"<User(email={self.email})>"
     
     def client_dict(self):
-        return model_to_dict(self,UserType)
+        user = model_to_dict(self,UserType)
+        user["location"] = UserLocationType(**user["location"])
+        return user
     
 class UserLocation(Base):
     __tablename__ = "user_locations"
@@ -48,11 +51,13 @@ class UserManager(BaseManager):
 
     def serialize_user(self, user: User) -> UserType:
         """Convert the User model to UserType"""
+        location = UserLocationType(user.location)
         return UserType(
             id=user.id,
             email=user.email,
             first_name=user.first_name,
             last_name=user.last_name,
+            location=location
         )
 
     def verify_password(self, password: str, hashed_password: str) -> bool:
@@ -108,4 +113,12 @@ class UserManager(BaseManager):
     
     def get_location(self, user_id):
         location = self.db.query(UserLocation).filter(UserLocation.user_id == user_id).first()
+        return location
+    
+    def update_location(self, location, latitude,longitude):
+        location_check = LocationUpdate(latitude=latitude,longitude=longitude)
+        for field,value in location_check.model_dump().items():
+            setattr(location,field,value)
+        self.db.commit()
+        self.db.refresh(location)
         return location

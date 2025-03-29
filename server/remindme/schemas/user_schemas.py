@@ -11,3 +11,7 @@ class UserCreate(UserBase):
 
 class UserUpdate(UserBase):
     email: Optional[EmailStr] = None
+
+class LocationUpdate(BaseModel):
+    latitude: float
+    longitude: float

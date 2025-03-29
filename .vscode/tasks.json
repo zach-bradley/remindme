@@ -16,6 +16,20 @@
             },
             "problemMatcher": [],
             "detail": "Starts up all Docker containers"
+          },
+          {
+            "label": "Stop Docker Containers",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": [
+              "down",
+            ],
+            "group": {
+              "kind": "build",
+              "isDefault": true
+            },
+            "problemMatcher": [],
+            "detail": "Stops up all Docker containers"
           }
     ]
 }

@@ -69,21 +69,16 @@ def verify_jwt_token(token: str, db: Session, redis_client) -> Optional[User]:
             token = token.split("Bearer ")[1]  # Remove "Bearer " prefix
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
-        print(user_id)
         if user_id is None:
             raise HTTPException(status_code=401, detail="Token is invalid or expired")
         
         # Check the cache for the user
         cached_user = get_user_cache(redis_client, user_id)
-        print(cached_user)
         if cached_user:
             # If user is found in cache, return the cached user
             return cached_user
         
-        # If user is not in the cache, retrieve from the database
-        print(uuid.UUID(user_id))
         user = db.query(User).filter(User.id == uuid.UUID(user_id)).first()
-        print(user)
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
         

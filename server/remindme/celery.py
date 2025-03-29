@@ -36,9 +36,13 @@ setup_logging()
 @celery_app.task
 def update_user_location(user_id,latitude,longitude):
     from .models.users import UserManager
-    db = get_db()
-    user_manager = UserManager(db).get_location(user_id)
-    celery_app.logger.info(user_manager)
-    location = user_manager.get_location(user_id)
-    celery_app.logger.info("User location: {}".format(location))
-    return
+    try:
+        db = next(get_db())
+        user_manager = UserManager(db)
+        location = user_manager.get_location(user_id)
+        updated_location = user_manager.update_location(location,latitude,longitude)
+        updated_location = "Location updated to: {}, {}".format(latitude,longitude)
+    except Exception as e:
+        print(e)
+        updated_location = str(e)
+    return updated_location

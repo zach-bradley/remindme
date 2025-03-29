@@ -24,8 +24,10 @@ def model_to_dict(instance, strawberry_type):
 
             if related_obj is None:
                 filtered_dict[rel.key] = None
-            elif isinstance(related_obj, Iterable) and not isinstance(related_obj, str):  # Handle lists of related objects
-                filtered_dict[rel.key] = [model_to_dict(obj, strawberry_type.__annotations__[rel.key].__args__[0]) for obj in related_obj]
-            else:  # Handle single related object
-                filtered_dict[rel.key] = model_to_dict(related_obj, strawberry_type.__annotations__[rel.key])
+            elif isinstance(related_obj, Iterable) and not isinstance(related_obj, str):
+                related_type = strawberry_type.__annotations__.get(rel.key)
+                filtered_dict[rel.key] = [model_to_dict(obj, related_type) for obj in related_obj]
+            else: 
+                related_type = strawberry_type.__annotations__.get(rel.key)
+                filtered_dict[rel.key] = model_to_dict(related_obj, related_type)
     return filtered_dict

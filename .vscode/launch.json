@@ -8,7 +8,7 @@
       "name": "Start Docker Containers and Debug",
       "type": "debugpy",
       "request": "launch",
-      "program": "${workspaceFolder}/server/remindme/main.py", 
+      "cwd": "${workspaceFolder}/server/docker",
       "preLaunchTask": "Start Docker Containers",
       "console": "integratedTerminal",
     }

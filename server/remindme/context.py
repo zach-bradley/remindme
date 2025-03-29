@@ -30,8 +30,6 @@ class MyContext(strawberry.fastapi.BaseContext):
 async def get_context(request: Request, db: Session = Depends(get_db), redis_client = Depends(get_redis)) -> MyContext:
     # Retrieve the current user using the context method
     if "/graphql" in str(request.url) and not request.headers.get("Authorization"):
-        # Skip authentication for IDE, set user to None
-        print("Here")
         return MyContext(db=db, redis_client=redis_client,user=None)
     current_user = MyContext(db, redis_client).get_current_user(request)
     return MyContext(db=db, redis_client=redis_client, user=current_user)

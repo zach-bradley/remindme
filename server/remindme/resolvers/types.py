@@ -3,6 +3,16 @@ import typing
 
 # Types
 @strawberry.type
+class UserLocationType:
+    longitude: float
+    latitude: float
+
+@strawberry.input
+class UserLocationInput:
+    longitude: float
+    latitude: float
+    
+@strawberry.type
 class TokenResponse:
     access_token: str
     refresh_token: str
@@ -14,6 +24,7 @@ class UserType:
     email: str
     first_name: typing.Optional[str] = None
     last_name: typing.Optional[str] = None    
+    location: UserLocationType
 
 @strawberry.type
 class ItemType:
@@ -60,13 +71,3 @@ class ItemInput:
 class ListInput:
     name: str
     store: str
-    
-@strawberry.type
-class UserLocationType:
-    longitude: float
-    latitude: float
-
-@strawberry.input
-class UserLocationInput:
-    longitude: float
-    latitude: float
