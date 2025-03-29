@@ -56,9 +56,17 @@ class ItemInput:
     quantity: int
     list_id: strawberry.ID
 
-
 @strawberry.input
 class ListInput:
     name: str
     store: str
     
+@strawberry.type
+class UserLocationType:
+    longitude: float
+    latitude: float
+
+@strawberry.input
+class UserLocationInput:
+    longitude: float
+    latitude: float

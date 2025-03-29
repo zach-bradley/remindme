@@ -4,7 +4,7 @@ from typing import Optional
 from uuid import UUID
 from .user_resolvers import UserResolvers
 from .list_resolvers import ListResolvers
-from .types import UserType, UserInput, TokenResponse,ListType, ListInput, ItemType, ItemInput, UserUpdateInput
+from .types import UserType, UserInput, TokenResponse,ListType, ListInput, ItemType, ItemInput, UserUpdateInput, UserLocationInput
 
 @strawberry.type
 class UserMutation:
@@ -36,6 +36,10 @@ class UserMutation:
         info.context.invalidate_user_cache(user.email)
         revoke_refresh_token(refresh_token, info.context.redis_client)
         return True
+    
+    @strawberry.mutation
+    def update_location(self, user_id: UUID,locData: UserLocationInput,info:strawberry.Info) -> bool:
+        return UserResolvers.update_location(user_id,locData)
 
 @strawberry.type
 class ListMutation:

@@ -1,7 +1,7 @@
 from redis import Redis
 from .config import settings
 
-
+print(settings.REDIS_HOST)
 redis_client = Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0)
 
 # Dependency function to provide access to the Redis client

@@ -2,6 +2,7 @@ from .config import settings
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.pool import NullPool
 from typing import Type, TypeVar, Optional, List
 from pydantic import BaseModel
 from sqlalchemy.dialects.postgresql import UUID
@@ -11,7 +12,7 @@ if db_url is None:
     raise RuntimeError("DATABASE_URL environment variable not set")
 
 metadata = MetaData()
-engine = create_engine(db_url)
+engine = create_engine(db_url, pool_pre_ping=True, poolclass=NullPool)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base(metadata=metadata)
 

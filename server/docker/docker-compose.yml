@@ -1,0 +1,62 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: remindme
+      POSTGRES_PASSWORD: remindme
+      POSTGRES_DB: remindme_db
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U remindme -d remindme_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - '6379:6379'
+    networks:
+      - backend
+
+  fastapi:
+    build:
+      context: ../..  
+      dockerfile: server/docker/Dockerfile
+    container_name: fastapi
+    command: uvicorn server.remindme.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - backend
+    env_file:
+      - ../.env
+
+  celery_worker:
+    build:
+      context: ../..
+      dockerfile: server/docker/Dockerfile
+    container_name: celery_worker
+    command: celery -A server.remindme worker --loglevel=info
+    volumes:
+      - ../../server:/app/server
+    depends_on:
+      - redis
+    env_file:
+      - ../.env
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

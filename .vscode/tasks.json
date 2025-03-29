@@ -12,13 +12,46 @@
         },
         "detail": "Starts Redis using Docker"
       },
-    {
-      "label": "Stop Redis",
-      "type": "shell",
-      "command": "docker stop redis && docker rm redis",
-      "problemMatcher": [],
-      "group": "none",
-      "detail": "Stops Redis container"
-    }
-  ]
+      {
+        "label": "Stop Redis",
+        "type": "shell",
+        "command": "docker stop redis && docker rm redis",
+        "problemMatcher": [],
+        "group": "none",
+        "detail": "Stops Redis container"
+      },
+      {
+        "label": "Start Docker Compose Services",
+        "type": "shell",
+        "command": "if [ \"$(docker ps -q -f name=celery_worker)\" ]; then echo 'Services are already running.'; else docker-compose up -d; fi",
+        "problemMatcher": [],
+        "options": {"cwd": "${workspaceFolder}/server/docker"},
+        "group": "build",
+        "detail": "Starts Redis and Celery worker using Docker Compose (if not already running)"
+      },
+      {
+        "label": "Stop Docker Compose Services",
+        "type": "shell",
+        "command": "cd \"${workspaceFolder//\\\\//}/server/docker\" && docker-compose down",
+        "problemMatcher": [],
+        "group": "none",
+        "detail": "Stops and removes Redis and Celery worker containers"
+      },
+      {
+        "label": "Rebuild and Start Docker Compose Services",
+        "type": "shell",
+        "command": "cd \"${workspaceFolder//\\\\//}/server/docker\" && docker-compose up -d --build",
+        "problemMatcher": [],
+        "group": "build",
+        "detail": "Rebuilds and starts Redis and Celery worker containers (use after code changes)"
+      },
+      {
+        "label": "View Docker Compose Logs",
+        "type": "shell",
+        "command": "cd \"${workspaceFolder//\\\\//}/server/docker\" && docker-compose logs -f",
+        "problemMatcher": [],
+        "group": "none",
+        "detail": "Shows logs from all Docker Compose services"
+      }
+    ]
 }

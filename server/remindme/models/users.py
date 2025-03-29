@@ -100,6 +100,12 @@ class UserManager(BaseManager):
             raise ValueError("Error validating info: {}".format(e))
         db_user = User(**validated_data.model_dump())
         self.db.add(db_user)
+        default_location = UserLocation(user=db_user)
+        self.db.add(default_location)
         self.db.commit()
         self.db.refresh(db_user)
         return self.serialize_user(db_user)
+    
+    def get_location(self, user_id):
+        location = self.db.query(UserLocation).filter(UserLocation.user_id == user_id).first()
+        return location

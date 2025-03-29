@@ -3,10 +3,11 @@ from typing import Optional, List as PyList
 from uuid import UUID
 from sqlalchemy.orm import Session
 from ..models.users import UserManager
-from .types import UserType, UserInput, TokenResponse, UserUpdateInput
+from .types import UserType, UserInput, TokenResponse, UserUpdateInput, UserLocationInput
 from..schemas.user_schemas import UserUpdate
 from ..auth import create_access_token, create_refresh_token
 from datetime import timedelta
+from ..celery import update_user_location
 
 class UserResolvers:
     @staticmethod
@@ -74,3 +75,8 @@ class UserResolvers:
         """Handle refreshing access and refresh tokens while checking revocation."""
         from ..auth import refresh_access_token
         return refresh_access_token(refresh_token)
+
+    @staticmethod
+    def update_location(user_id: UUID,locData: UserLocationInput) -> bool:
+        update_user_location.apply_async(args=[user_id, locData.latitude, locData.longitude], countdown=10)
+        return True
