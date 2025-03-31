@@ -45,7 +45,6 @@ export class ListApi {
             { listData: "ListInput!"},
             "createList"
         );
-        console.log(createListMutation)
         const response = await fetch(`${this.baseUrl}`, {
             method: 'POST',
             headers: this.getHeaders(),

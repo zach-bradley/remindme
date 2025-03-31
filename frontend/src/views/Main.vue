@@ -17,43 +17,11 @@
       </ion-refresher>
 
       <div class="ion-padding">
-        <!-- Add New List Card -->
-        <ion-card class="mb-4">
-          <ion-card-header>
-            <ion-card-title>Create New List</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <ion-item>
-              <ion-input
-                v-model="newList.name"
-                label="Name"
-                label-placement="floating"
-                shape="round"
-                fill="outline"
-                placeholder="Enter list name"
-              ></ion-input>
-            </ion-item>
-            <ion-item>
-              <ion-input
-                v-model="newList.store"
-                label="Store"
-                label-placement="floating"
-                shape="round"
-                fill="outline"
-                placeholder="Enter store name"
-              ></ion-input>
-            </ion-item>
-            <ion-button
-              expand="block"
-              class="ion-margin-top"
-              :disabled="!newList.name || !newList.store || isLoading"
-              @click="createList"
-            >
-              <ion-spinner v-if="isLoading" name="crescent"></ion-spinner>
-              <span v-else>Create List</span>
-            </ion-button>
-          </ion-card-content>
-        </ion-card>
+        <!-- Add List Button -->
+        <ion-button expand="block" @click="openCreateModal" class="ion-margin-bottom">
+          <ion-icon :icon="addOutline" slot="start"></ion-icon>
+          Create New List
+        </ion-button>
 
         <!-- Lists Section -->
         <ion-card v-if="lists.length > 0">
@@ -87,6 +55,51 @@
         </ion-card>
       </div>
     </ion-content>
+
+    <!-- Create List Modal -->
+    <ion-modal :is-open="isCreateModalOpen" @didDismiss="closeCreateModal">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Create New List</ion-title>
+          <ion-buttons slot="end">
+            <ion-button @click="closeCreateModal">
+              <ion-icon :icon="closeOutline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-item>
+          <ion-input
+            v-model="newList.name"
+            label="Name"
+            label-placement="floating"
+            shape="round"
+            fill="outline"
+            placeholder="Enter list name"
+          ></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input
+            v-model="newList.store"
+            label="Store"
+            label-placement="floating"
+            shape="round"
+            fill="outline"
+            placeholder="Enter store name"
+          ></ion-input>
+        </ion-item>
+        <ion-button
+          expand="block"
+          class="ion-margin-top"
+          :disabled="!newList.name || !newList.store || isLoading"
+          @click="createList"
+        >
+          <ion-spinner v-if="isLoading" name="crescent"></ion-spinner>
+          <span v-else>Create List</span>
+        </ion-button>
+      </ion-content>
+    </ion-modal>
   </ion-page>
 </template>
 
@@ -113,13 +126,16 @@ import {
   IonButtons,
   IonRefresher,
   IonRefresherContent,
-  IonSpinner
+  IonSpinner,
+  IonModal
 } from '@ionic/vue';
 import { ListInput } from '../services/lists/list.model';
 import {
   chevronForward,
   logOutOutline,
-  listOutline
+  listOutline,
+  addOutline,
+  closeOutline
 } from 'ionicons/icons';
 import { useMainStore } from '../store';
 
@@ -145,7 +161,8 @@ export default defineComponent({
     IonButtons,
     IonRefresher,
     IonRefresherContent,
-    IonSpinner
+    IonSpinner,
+    IonModal
   },
   setup() {
     const store = useMainStore();
@@ -156,6 +173,7 @@ export default defineComponent({
     const error = computed(() => store.error);
     const username = computed(() => store.username);
     
+    const isCreateModalOpen = ref(false);
     const newList = ref<Partial<ListInput>>({
       name: '',
       store: ''
@@ -165,10 +183,19 @@ export default defineComponent({
       await store.fetchLists();
     };
 
+    const openCreateModal = () => {
+      isCreateModalOpen.value = true;
+    };
+
+    const closeCreateModal = () => {
+      isCreateModalOpen.value = false;
+      newList.value = { name: '', store: '' };
+    };
+
     const createList = async () => {
       try {
         await store.createList(newList.value as ListInput);
-        newList.value = { name: '', store: '' };
+        closeCreateModal();
       } catch (error) {
         console.error('Error creating list:', error);
       }
@@ -212,13 +239,18 @@ export default defineComponent({
       newList,
       isLoading,
       error,
+      isCreateModalOpen,
       handleLogout,
       createList,
       openList,
       handleRefresh,
+      openCreateModal,
+      closeCreateModal,
       chevronForward,
       logOutOutline,
-      listOutline
+      listOutline,
+      addOutline,
+      closeOutline
     };
   }
 });

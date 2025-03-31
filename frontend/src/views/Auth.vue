@@ -119,7 +119,6 @@ export default defineComponent({
         let response;
         if (isLogin.value) {
           const loginData: LoginRequest = { email: email.value, password: password.value };
-          console.log(loginData)
           response = await authModel.api.login(loginData);
         } else {
           const registerData: RegisterRequest = {
