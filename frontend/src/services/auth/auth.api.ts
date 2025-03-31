@@ -1,4 +1,5 @@
-import { LoginRequest, RegisterRequest, AuthResponse, User } from './auth.model';
+import { LoginRequest, RegisterRequest, AuthResponse } from './auth.model';
+import {User} from '../users/user.model';
 import { mutationBase } from '../../graphql/mutation';
 import { queryBase } from '../../graphql/query';
 
@@ -57,9 +58,7 @@ export class AuthApi {
                 variables: { email: request.email, password: request.password }
             })
         });
-        console.log(response)
         const data = await this.handleResponse(response);
-        console.log(data)
         if (data.data?.login?.accessToken) {
             this.setToken(data.data.login.accessToken);
             // Fetch user data after successful login
@@ -88,13 +87,13 @@ export class AuthApi {
         if (data.data?.register?.accessToken) {
             this.setToken(data.data.register.accessToken);
             // Fetch user data after successful registration
-            const user = await this.getCurrentUser();
+            const user = await this.getCurrentUser(data.data.register.accessToken);
             return { ...data, user };
         }
         return data;
     }
 
-    async getCurrentUser(token: string): Promise<User> {
+    async getCurrentUser(token: String): Promise<User> {
         const meQuery = queryBase(
             "me",
             "me",

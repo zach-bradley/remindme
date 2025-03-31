@@ -99,13 +99,13 @@ def serialize_user(user: User) -> dict:
 
 def set_user_cache(redis_client, user_id: str):
     """Store the serialized user data in Redis."""
-    redis_client.setex("user_id", 3600, user_id)  # Cache for 1 hour
+    redis_client.setex("user_id", 3600, json.dumps({"user_id":user_id}))  # Cache for 1 hour
 
 def get_user_cache(redis_client, user_id: str) -> Optional[str]:
     """Retrieve the user from the Redis cache and deserialize it."""
     cached_user = redis_client.get("user_id")
     if cached_user:
-        user_id = json.loads(cached_user)
+        user_id = json.loads(cached_user).get("user_id", None)
         return user_id
     return None
 

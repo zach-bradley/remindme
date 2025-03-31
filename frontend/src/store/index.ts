@@ -1,17 +1,18 @@
 import { defineStore } from 'pinia';
-import { User } from '../services/auth/auth.model';
+import { User } from '../services/users/user.model';
 import { List, ListInput } from '../services/lists/list.model';
 import { ListApi } from '../services/lists/list.api';
 import { authApi } from '../services/auth/auth.api';
+import { userApi } from '@/services/users/user.api';
 
 const listApi = new ListApi();
 
 export const useMainStore = defineStore('main', {
     state: () => ({
-        isAuthenticated: false,
+        isAuthenticated: false as Boolean,
         user: null as User | null,
         lists: [] as List[],
-        isLoading: false,
+        isLoading: false as Boolean,
         error: null as string | null
     }),
 
@@ -24,7 +25,7 @@ export const useMainStore = defineStore('main', {
             const token = authApi.getToken();
             if (token) {
                 try {
-                    const user = await authApi.getCurrentUser();
+                    const user = await userApi.getCurrentUser();
                     this.setUser(user);
                     this.setAuth(true);
                     await this.fetchLists();

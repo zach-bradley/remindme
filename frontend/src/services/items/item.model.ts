@@ -1,17 +1,16 @@
 export interface Item {
-    id: string;
-    title: string;
-    description: string;
-    listId: string;
-    checked: boolean;
-    dueDate: string;
-    createdAt: string;
-    updatedAt: string;
+    id: String;
+    title: String;
+    description: String;
+    listId: String;
+    checked: Boolean;
+    dueDate: String;
+    createdAt: String;
+    updatedAt: String;
 }
 
 export interface ItemInput {
-    title: string;
-    description: string;
-    listId: string;
-    dueDate: string;
+    name: String;
+    quantity: String;
+    listId: String;
 } 

@@ -1,10 +1,10 @@
+import { List, ListInput, Item, ItemInput } from './list.model';
 import { mutationBase } from '../../graphql/mutation';
 import { queryBase } from '../../graphql/query';
-import { List, ListInput, Item, ItemInput } from './list.model';
+import { authApi } from '../auth/auth.api';
 
 export class ListApi {
     private baseUrl = "/graphql";
-    private token: string | null = null;
 
     private async handleResponse(response: Response) {
         if (!response.ok) {
@@ -14,207 +14,167 @@ export class ListApi {
         return response.json();
     }
 
-    setToken(token: string) {
-        this.token = token;
-    }
-
     getHeaders() {
-        const headers: Record<string, string> = {
-            'Content-Type': 'application/json'
-        };
-        if (this.token) {
-            headers['Authorization'] = `Bearer ${this.token}`;
-        }
-        return headers;
+        return authApi.getHeaders();
     }
 
-    async getList(id: String): Promise<List> {
-        const getListQuery = queryBase(
-            "getList",
-            "list",
-            ["id", "name", "place", "userId", "items { id name quantity checked }"],
-            { id: {type:"String!",value:id} }
-        );
-
-        const response = await fetch(this.baseUrl, {
-            method: 'POST',
-            headers: this.getHeaders(),
-            body: JSON.stringify({
-                query: getListQuery,
-                variables: { id }
-            })
-        });
-
-        const data = await this.handleResponse(response);
-        return data.data.list;
-    }
-
-    async getLists(id: string): Promise<List[]> {
-        const getListsQuery = queryBase(
-            "getLists",
+    async getLists(userId: string): Promise<List[]> {
+        const listsQuery = queryBase(
             "lists",
-            ["id", "name", "place", "userId", "items { id name quantity checked }"],
-            { id: {type: "String!",  value: id}}
+            "lists",
+            ["id", "name", "store", "userId", "items { id name quantity checked }"],
+            { userId: { type: "ID!", value: userId } }
         );
-
-        const response = await fetch(this.baseUrl, {
+        const response = await fetch(`${this.baseUrl}`, {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({
-                query: getListsQuery,
-                variables: { id: id }
+                query: listsQuery,
+                variables: { userId }
             })
         });
-
         const data = await this.handleResponse(response);
         return data.data.lists;
     }
 
-    async createList(request: ListInput): Promise<List> {
+    async createList(listData: ListInput): Promise<List> {
         const createListMutation = mutationBase(
             "createList",
-            ["id", "name", "store", "userId", "items { id name quantity checked}"],
-            { list_data: "ListInput!" },
+            ["id", "name", "store", "userId", "items { id name quantity checked }"],
+            { listData: { type: "ListInput!", value: listData } },
             "createList"
         );
-
-        const response = await fetch(this.baseUrl, {
+        const response = await fetch(`${this.baseUrl}`, {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({
                 query: createListMutation,
-                variables: { list_data: request }
+                variables: { listData }
             })
         });
-
         const data = await this.handleResponse(response);
         return data.data.createList;
     }
 
-    async updateList(id: string, request: ListInput): Promise<List> {
+    async updateList(listId: string, listData: Partial<ListInput>): Promise<List> {
         const updateListMutation = mutationBase(
             "updateList",
             ["id", "name", "store", "userId", "items { id name quantity checked }"],
-            { id: "UUID!", list_data: "ListInput!" },
+            { 
+                listId: { type: "ID!", value: listId },
+                listData: { type: "ListInput!", value: listData }
+            },
             "updateList"
         );
-
-        const response = await fetch(this.baseUrl, {
+        const response = await fetch(`${this.baseUrl}`, {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({
                 query: updateListMutation,
-                variables: { id, list_data: request }
+                variables: { listId, listData }
             })
         });
-
         const data = await this.handleResponse(response);
         return data.data.updateList;
     }
 
-    async deleteList(id: string): Promise<boolean> {
+    async deleteList(listId: string): Promise<boolean> {
         const deleteListMutation = mutationBase(
             "deleteList",
-            ["id"],
-            { id: "UUID!" },
+            ["success"],
+            { listId: { type: "ID!", value: listId } },
             "deleteList"
         );
-
-        const response = await fetch(this.baseUrl, {
+        const response = await fetch(`${this.baseUrl}`, {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({
                 query: deleteListMutation,
-                variables: { id }
+                variables: { listId }
             })
         });
-
         const data = await this.handleResponse(response);
-        return data.data.deleteList;
+        return data.data.deleteList.success;
     }
 
-    // Item operations
-    async createItem(listId: string, request: ItemInput): Promise<Item> {
-        const createItemMutation = mutationBase(
-            "createItem",
+    async addItem(itemData: ItemInput): Promise<Item> {
+        const addItemMutation = mutationBase(
+            "addItem",
             ["id", "name", "quantity", "checked"],
-            { list_id: "UUID!", item_data: "ItemInput!" },
-            "createItem"
+            { itemData: { type: "ItemInput!", value: itemData } },
+            "addItem"
         );
-
-        const response = await fetch(this.baseUrl, {
+        const response = await fetch(`${this.baseUrl}`, {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({
-                query: createItemMutation,
-                variables: { list_id: listId, item_data: request }
+                query: addItemMutation,
+                variables: { itemData }
             })
         });
-
         const data = await this.handleResponse(response);
-        return data.data.createItem;
+        return data.data.addItem;
     }
 
-    async updateItem(id: string, request: ItemInput): Promise<Item> {
+    async updateItem(itemId: string, itemData: Partial<ItemInput>): Promise<Item> {
         const updateItemMutation = mutationBase(
             "updateItem",
             ["id", "name", "quantity", "checked"],
-            { id: "UUID!", item_data: "ItemInput!" },
+            { 
+                itemId: { type: "ID!", value: itemId },
+                itemData: { type: "ItemInput!", value: itemData }
+            },
             "updateItem"
         );
-
-        const response = await fetch(this.baseUrl, {
+        const response = await fetch(`${this.baseUrl}`, {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({
                 query: updateItemMutation,
-                variables: { id, item_data: request }
+                variables: { itemId, itemData }
             })
         });
-
         const data = await this.handleResponse(response);
         return data.data.updateItem;
     }
 
-    async deleteItem(id: string): Promise<boolean> {
+    async deleteItem(itemId: string): Promise<boolean> {
         const deleteItemMutation = mutationBase(
             "deleteItem",
-            ["id"],
-            { id: "UUID!" },
+            ["success"],
+            { itemId: { type: "ID!", value: itemId } },
             "deleteItem"
         );
-
-        const response = await fetch(this.baseUrl, {
+        const response = await fetch(`${this.baseUrl}`, {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({
                 query: deleteItemMutation,
-                variables: { id }
+                variables: { itemId }
             })
         });
-
         const data = await this.handleResponse(response);
-        return data.data.deleteItem;
+        return data.data.deleteItem.success;
     }
 
-    async toggleItemChecked(id: string): Promise<Item> {
-        const toggleCheckedMutation = mutationBase(
+    async toggleItemChecked(itemId: string): Promise<Item> {
+        const toggleItemMutation = mutationBase(
             "toggleItemChecked",
             ["id", "name", "quantity", "checked"],
-            { id: "UUID!" },
+            { itemId: { type: "ID!", value: itemId } },
             "toggleItemChecked"
         );
-
-        const response = await fetch(this.baseUrl, {
+        const response = await fetch(`${this.baseUrl}`, {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({
-                query: toggleCheckedMutation,
-                variables: { id }
+                query: toggleItemMutation,
+                variables: { itemId }
             })
         });
-
         const data = await this.handleResponse(response);
         return data.data.toggleItemChecked;
     }
-} 
+}
+
+export const listApi = new ListApi(); 

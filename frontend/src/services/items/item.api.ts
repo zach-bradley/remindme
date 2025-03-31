@@ -31,7 +31,7 @@ export class ItemApi {
     async createItem(request: ItemInput): Promise<Item> {
         const createItemMutation = mutationBase(
             "createItem",
-            ["id", "title", "description", "listId", "checked", "dueDate", "createdAt", "updatedAt"],
+            ["id", "name", "quantity", "listId"],
             { item_data: "ItemInput!" },
             "createItem"
         );
@@ -49,11 +49,11 @@ export class ItemApi {
         return data.data.createItem;
     }
 
-    async updateItem(id: string, request: ItemInput): Promise<Item> {
+    async updateItem(id: String, request: ItemInput): Promise<Item> {
         const updateItemMutation = mutationBase(
             "updateItem",
             ["id", "title", "description", "listId", "checked", "dueDate", "createdAt", "updatedAt"],
-            { id: "UUID!", item_data: "ItemInput!" },
+            { id: "String!", item_data: "ItemInput!" },
             "updateItem"
         );
 
@@ -70,11 +70,11 @@ export class ItemApi {
         return data.data.updateItem;
     }
 
-    async deleteItem(id: string): Promise<boolean> {
+    async deleteItem(id: String): Promise<boolean> {
         const deleteItemMutation = mutationBase(
             "deleteItem",
             ["id"],
-            { id: "UUID!" },
+            { id: "String!" },
             "deleteItem"
         );
 
@@ -91,11 +91,11 @@ export class ItemApi {
         return data.data.deleteItem;
     }
 
-    async toggleChecked(id: string): Promise<Item> {
+    async toggleChecked(id: String): Promise<Item> {
         const toggleCheckedMutation = mutationBase(
             "toggleChecked",
             ["id", "title", "description", "listId", "checked", "dueDate", "createdAt", "updatedAt"],
-            { id: "UUID!" },
+            { id: "String!" },
             "toggleChecked"
         );
 
@@ -112,12 +112,12 @@ export class ItemApi {
         return data.data.toggleChecked;
     }
 
-    async getItem(id: string): Promise<Item> {
+    async getItem(id: String): Promise<Item> {
         const getItemQuery = queryBase(
             "getItem",
             "item",
             ["id", "title", "description", "listId", "checked", "dueDate", "createdAt", "updatedAt"],
-            { id: "UUID!" }
+            { id: {type:"String!",value:id} }
         );
 
         const response = await fetch(this.baseUrl, {

@@ -1,6 +1,6 @@
 <template>
   <ion-app>
-    <ion-menu content-id="main-content" type="overlay">
+    <ion-menu content-id="main-content" type="overlay" v-if="this.store.isAuthenticated">
       <ion-content>
         <ion-list id="inbox-list">
           <ion-list-header>RemindMe</ion-list-header>
@@ -80,6 +80,7 @@ export default defineComponent({
   setup() {
     const store = useMainStore();
     const selectedIndex = ref(0);
+    
     const appPages = [
       {
         title: 'Settings',
@@ -94,6 +95,7 @@ export default defineComponent({
     ];
 
     return {
+      store,
       selectedIndex,
       appPages,
       homeOutline,

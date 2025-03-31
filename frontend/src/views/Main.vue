@@ -223,36 +223,26 @@ export default defineComponent({
 </script>
 
 <style scoped>
-ion-card {
-  background-color: var(--ion-card-background-color);
+.align-items {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+h1 {
   margin: 0;
+  font-size: 36px;
 }
-
-ion-item {
-  --padding-start: 0;
-  --inner-padding-end: 0;
+.full-height {
+  height: 100%;
 }
-
-ion-input {
-  --padding-start: 0;
-  --padding-end: 0;
+ion-card {
+  background-color: var(--ion-card-background-color); 
+  padding: 10px;
 }
-
-ion-list {
-  background: transparent;
+ion-col {
+ margin: auto;
 }
-
-ion-item {
-  --background: transparent;
-  --background-hover: var(--ion-color-light);
-  --background-activated: var(--ion-color-light);
-}
-
-ion-button {
-  --box-shadow: none;
-}
-
-ion-spinner {
-  margin-right: 8px;
+ion-card-title , ion-card-subtitle {
+  text-align: center;
 }
 </style>
