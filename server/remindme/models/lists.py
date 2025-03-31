@@ -18,9 +18,10 @@ class List(TimeStampModel):
     user = relationship("User", back_populates="lists")
 
     @classmethod
-    def get_by_user(cls, session: Session, user_id: str):
-        return session.query(cls).filter(cls.user_id == user_id).all()
-
+    def get_by_user(cls, session: Session, user_id: UUID):
+        lists = session.query(cls).filter(cls.user_id == user_id).all()
+        return [ListType(**list.client_dict()) for list in lists]
+    
     def client_dict(self):
         return model_to_dict(self,ListType)
 

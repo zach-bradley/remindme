@@ -25,7 +25,7 @@ export const useMainStore = defineStore('main', {
             const token = authApi.getToken();
             if (token) {
                 try {
-                    const user = await userApi.getCurrentUser();
+                    const user = await userApi.getCurrentUser(token);
                     this.setUser(user);
                     this.setAuth(true);
                     await this.fetchLists();

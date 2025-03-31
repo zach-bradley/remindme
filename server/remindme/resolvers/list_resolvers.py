@@ -7,7 +7,7 @@ from ..schemas.list_schemas import ListCreate
 
 class ListResolvers:
     @staticmethod
-    def get_list(id: UUID, db: Session) -> Optional[ListType]:
+    def get_list(user_id: UUID, db: Session) -> Optional[ListType]:
         list_obj = db.query(ListModel).filter(ListModel.id == id).first()
         if not list_obj:
             return None

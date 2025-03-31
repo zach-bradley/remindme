@@ -18,19 +18,19 @@ export class ListApi {
         return authApi.getHeaders();
     }
 
-    async getLists(userId: string): Promise<List[]> {
+    async getLists(user_id: String): Promise<List[]> {
         const listsQuery = queryBase(
             "lists",
             "lists",
-            ["id", "name", "store", "userId", "items { id name quantity checked }"],
-            { userId: { type: "ID!", value: userId } }
+            ["id", "name", "store", "user_id", "items { id name quantity checked }"],
+            { user_id: { type: "String!", value: userId } }
         );
         const response = await fetch(`${this.baseUrl}`, {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({
                 query: listsQuery,
-                variables: { userId }
+                variables: { user_id: userId }
             })
         });
         const data = await this.handleResponse(response);

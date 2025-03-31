@@ -24,9 +24,9 @@ def get_list(id: UUID, info: strawberry.Info) -> Optional[ListType]:
     db = info.context.db
     return ListResolvers.get_list(id, db)
 
-def get_lists(id: UUID,info: strawberry.Info) -> PyList[ListType]:
+def get_lists(user_id: UUID,info: strawberry.Info) -> PyList[ListType]:
     db = info.context.db
-    return ListResolvers.get_lists(db, id)
+    return ListResolvers.get_lists(db, user_id)
 
 def get_item(id: UUID, info: strawberry.Info) -> Optional[ItemType]:
     db = info.context.db

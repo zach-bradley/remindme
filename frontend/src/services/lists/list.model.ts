@@ -10,7 +10,7 @@ export interface List {
     name: string;
     store: string;
     items: Item[];
-    userId: string;
+    user_id: string;
 }
 
 export interface ItemInput {
