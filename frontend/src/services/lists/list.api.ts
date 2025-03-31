@@ -18,19 +18,20 @@ export class ListApi {
         return authApi.getHeaders();
     }
 
-    async getLists(user_id: String): Promise<List[]> {
+    async getLists(userId: String): Promise<List[]> {
         const listsQuery = queryBase(
             "lists",
             "lists",
-            ["id", "name", "store", "user_id", "items { id name quantity checked }"],
-            { user_id: { type: "String!", value: userId } }
+            ["id", "name", "store", "userId", "items { id name quantity checked }"],
+            { userId: { type: "UUID!", value: userId } }
         );
+
         const response = await fetch(`${this.baseUrl}`, {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({
                 query: listsQuery,
-                variables: { user_id: userId }
+                variables: { userId }
             })
         });
         const data = await this.handleResponse(response);
@@ -41,9 +42,10 @@ export class ListApi {
         const createListMutation = mutationBase(
             "createList",
             ["id", "name", "store", "userId", "items { id name quantity checked }"],
-            { listData: { type: "ListInput!", value: listData } },
+            { listData: "ListInput!"},
             "createList"
         );
+        console.log(createListMutation)
         const response = await fetch(`${this.baseUrl}`, {
             method: 'POST',
             headers: this.getHeaders(),

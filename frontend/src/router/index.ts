@@ -31,10 +31,11 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const store = useMainStore();
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-
+  console.log(requiresAuth)
+  console.log(store.isAuthenticated)
   if (requiresAuth && !store.isAuthenticated) {
     next('/auth');
-  } else if (!requiresAuth && store.isAuthenticated) {
+  } else if (requiresAuth && store.isAuthenticated && to.path === '/auth') {
     next('/home');
   } else {
     next();

@@ -18,12 +18,12 @@ export class UserApi {
         return authApi.getHeaders();
     }
 
-    async getCurrentUser(token: "String!"): Promise<User> {
+    async getCurrentUser(token: string): Promise<User> {
         const meQuery = queryBase(
             "me",
             "me",
             ["id", "email", "firstName", "lastName", "location { latitude longitude }"],
-            {token: {type:"String!",value:token}}
+            {token: {type:"String",value:token}}
         );
         const response = await fetch(`${this.baseUrl}`, {
             method: 'POST',
