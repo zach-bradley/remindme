@@ -12,10 +12,17 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'),
     },
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@forward "@/theme/variables.scss";`
+      }
+    }
+  },
   server: {
     proxy: {
-      '/api': 'http://localhost:8000',
-      '/graphql': 'http://localhost:8000',
+      '/api': 'http://0.0.0.0:8000',
+      '/graphql': 'http://0.0.0.0:8000',
     },
     port: 8000
   },

@@ -1,32 +1,98 @@
 <template>
   <ion-page>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>My Lists</ion-title>
+        <ion-buttons slot="end">
+          <ion-button @click="handleLogout" color="danger">
+            <ion-icon :icon="logOutOutline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
     <ion-content>
-      <div class="min-h-screen p-8">
-        <div class="max-w-4xl mx-auto">
-          <div class="flex justify-between items-center mb-8">
-            <h1 class="text-2xl">Welcome, {{ username }}!</h1>
-            <ion-button @click="handleLogout" color="danger">
-              Logout
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+
+      <div class="ion-padding">
+        <!-- Add New List Card -->
+        <ion-card class="mb-4">
+          <ion-card-header>
+            <ion-card-title>Create New List</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-item>
+              <ion-input
+                v-model="newList.name"
+                label="Name"
+                label-placement="floating"
+                shape="round"
+                fill="outline"
+                placeholder="Enter list name"
+              ></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-input
+                v-model="newList.store"
+                label="Store"
+                label-placement="floating"
+                shape="round"
+                fill="outline"
+                placeholder="Enter store name"
+              ></ion-input>
+            </ion-item>
+            <ion-button
+              expand="block"
+              class="ion-margin-top"
+              :disabled="!newList.name || !newList.store || isLoading"
+              @click="createList"
+            >
+              <ion-spinner v-if="isLoading" name="crescent"></ion-spinner>
+              <span v-else>Create List</span>
             </ion-button>
-          </div>
-          <ion-card>
-            <ion-card-header>
-              <ion-card-title>Dashboard</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              <p>This is your protected home page.</p>
-            </ion-card-content>
-          </ion-card>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Lists Section -->
+        <ion-card v-if="lists.length > 0">
+          <ion-card-header>
+            <ion-card-title>Your Lists</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list>
+              <ion-item v-for="list in lists" :key="list.id" button @click="openList(list)">
+                <ion-label>
+                  <h2>{{ list.name }}</h2>
+                  <p>{{ list.store }}</p>
+                </ion-label>
+                <ion-icon :icon="chevronForward" slot="end"></ion-icon>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Empty State -->
+        <div v-else class="ion-text-center ion-padding">
+          <ion-icon :icon="listOutline" style="font-size: 48px; color: var(--ion-color-medium)"></ion-icon>
+          <p class="ion-text-center ion-padding-top">No lists yet. Create your first list above!</p>
         </div>
+
+        <!-- Error State -->
+        <ion-card v-if="error" color="danger">
+          <ion-card-content>
+            <ion-text color="light">{{ error }}</ion-text>
+          </ion-card-content>
+        </ion-card>
       </div>
     </ion-content>
   </ion-page>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
-import { useStore } from 'vuex';
-import { useIonRouter } from '@ionic/vue'
+import { defineComponent, ref, onMounted, computed } from "vue";
+import { useIonRouter } from '@ionic/vue';
 import {
   IonPage,
   IonContent,
@@ -34,8 +100,27 @@ import {
   IonCard,
   IonCardHeader,
   IonCardTitle,
-  IonCardContent
+  IonCardContent,
+  IonItem,
+  IonInput,
+  IonList,
+  IonLabel,
+  IonIcon,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonRefresher,
+  IonRefresherContent,
+  IonSpinner
 } from '@ionic/vue';
+import { ListInput } from '../services/lists/list.model';
+import {
+  chevronForward,
+  logOutOutline,
+  listOutline
+} from 'ionicons/icons';
+import { useMainStore } from '../store';
 
 export default defineComponent({
   name: 'HomePage',
@@ -46,14 +131,55 @@ export default defineComponent({
     IonCard,
     IonCardHeader,
     IonCardTitle,
-    IonCardContent
+    IonCardContent,
+    IonItem,
+    IonInput,
+    IonList,
+    IonLabel,
+    IonIcon,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonButtons,
+    IonRefresher,
+    IonRefresherContent,
+    IonSpinner
   },
   setup() {
-    const store = useStore();
+    const store = useMainStore();
     const router = useIonRouter();
     
-    // Fallback to 'Guest' if username is not available
-    const username = computed(() => store.state.user?.username || 'Guest');
+    const lists = computed(() => store.lists);
+    const isLoading = computed(() => store.isLoading);
+    const error = computed(() => store.error);
+    const username = computed(() => store.username);
+    
+    const newList = ref<Partial<ListInput>>({
+      name: '',
+      store: ''
+    });
+    
+    const fetchLists = async () => {
+      await store.fetchLists();
+    };
+
+    const createList = async () => {
+      try {
+        await store.createList(newList.value as ListInput);
+        newList.value = { name: '', store: '' };
+      } catch (error) {
+        console.error('Error creating list:', error);
+      }
+    };
+
+    const openList = (list: any) => {
+      router.push(`/list/${list.id}`);
+    };
+
+    const handleRefresh = async (event: any) => {
+      await fetchLists();
+      event.target.complete();
+    };
     
     const handleLogout = async () => {
       try {
@@ -64,11 +190,7 @@ export default defineComponent({
           }
         });
         if (response.ok) {
-          // Clear authentication state and user data in the store
-          store.commit('setAuth', false);
-          store.commit('setUser', null); // Reset user data
-          
-          // Redirect to the auth page (login/register)
+          store.logout();
           router.push('/auth');
         } else {
           console.error('Logout failed:', response.statusText);
@@ -78,14 +200,59 @@ export default defineComponent({
       }
     };
 
+    onMounted(() => {
+      fetchLists();
+    });
+
     return {
       username,
-      handleLogout
+      lists,
+      newList,
+      isLoading,
+      error,
+      handleLogout,
+      createList,
+      openList,
+      handleRefresh,
+      chevronForward,
+      logOutOutline,
+      listOutline
     };
   }
 });
 </script>
 
 <style scoped>
-/* You can add any styles specific to the home page here */
+ion-card {
+  background-color: var(--ion-card-background-color);
+  margin: 0;
+}
+
+ion-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+}
+
+ion-input {
+  --padding-start: 0;
+  --padding-end: 0;
+}
+
+ion-list {
+  background: transparent;
+}
+
+ion-item {
+  --background: transparent;
+  --background-hover: var(--ion-color-light);
+  --background-activated: var(--ion-color-light);
+}
+
+ion-button {
+  --box-shadow: none;
+}
+
+ion-spinner {
+  margin-right: 8px;
+}
 </style>

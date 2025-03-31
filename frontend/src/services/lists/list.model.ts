@@ -1,7 +1,7 @@
 export interface List {
     id: string;
-    title: string;
-    description: string;
+    name: string;
+    store: string;
     userId: string;
     items: Item[];
     createdAt: string;
@@ -9,13 +9,13 @@ export interface List {
 }
 
 export interface ListInput {
-    title: string;
-    description: string;
+    name: string;
+    store: string;
 }
 
 export interface Item {
     id: string;
-    title: string;
+    name: string;
     quantity: number;
     checked: boolean;
     createdAt: string;
@@ -23,6 +23,6 @@ export interface Item {
 }
 
 export interface ItemInput {
-    title: string;
+    name: string;
     quantity: number;
 }

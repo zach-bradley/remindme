@@ -7,6 +7,10 @@ from .types import UserType,ListType, ItemType
 
 
 # User resolvers
+def get_me(token: str,info:strawberry.Info) -> Optional[UserType]:
+    user = info.context.get_current_user()
+    return UserType(**user.client_dict())
+
 def get_user(id: UUID, info: strawberry.Info) -> Optional[UserType]:
     db = info.context.db
     return UserResolvers.get_user(id, db)
@@ -20,9 +24,9 @@ def get_list(id: UUID, info: strawberry.Info) -> Optional[ListType]:
     db = info.context.db
     return ListResolvers.get_list(id, db)
 
-def get_lists(user_id: str,info: strawberry.Info) -> PyList[ListType]:
+def get_lists(id: UUID,info: strawberry.Info) -> PyList[ListType]:
     db = info.context.db
-    return ListResolvers.get_lists(db, user_id)
+    return ListResolvers.get_lists(db, id)
 
 def get_item(id: UUID, info: strawberry.Info) -> Optional[ItemType]:
     db = info.context.db
@@ -30,6 +34,7 @@ def get_item(id: UUID, info: strawberry.Info) -> Optional[ItemType]:
 
 @strawberry.type
 class Query:
+    me: Optional[UserType] = strawberry.field(resolver=get_me)
     user: Optional[UserType] = strawberry.field(resolver=get_user)
     users: PyList[UserType] = strawberry.field(resolver=get_users)
     list: Optional[ListType] = strawberry.field(resolver=get_list)

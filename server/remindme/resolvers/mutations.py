@@ -31,7 +31,7 @@ class UserMutation:
     @strawberry.mutation
     def logout(self, refresh_token:str,info: strawberry.Info) -> bool:
         from ..auth import revoke_refresh_token
-        user = info.context.user
+        user = info.context.get_current_user()
 
         info.context.invalidate_user_cache(user.email)
         revoke_refresh_token(refresh_token, info.context.redis_client)
@@ -46,7 +46,7 @@ class ListMutation:
     @strawberry.mutation
     def create_list(self, list_data: ListInput, info: strawberry.Info) -> ListType:
         db = info.context.db
-        return ListResolvers.create_list(user_id=info.context.user.id,list_data=list_data, db=db)
+        return ListResolvers.create_list(user_id=UUID(info.context.user_id),list_data=list_data, db=db)
     
     @strawberry.mutation
     def update_list(self, id: UUID, list_data: ListInput, info: strawberry.Info) -> Optional[ListType]:

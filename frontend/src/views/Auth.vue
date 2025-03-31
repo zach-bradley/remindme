@@ -20,32 +20,32 @@
               </ion-card-header>
 
               <ion-card-content>       
-                    <ion-row v-if="!isLogin">
-                      <ion-col style="padding-left:0;">
-                        <ion-input shape="round" fill="outline" label-placement="floating" label="First Name" v-model="firstName" required></ion-input>
-                      </ion-col>
-                      <ion-col style="padding-right:0;">
-                        <ion-input shape="round" fill="outline" label-placement="floating" label="Last Name" v-model="lastName" required></ion-input>
-                      </ion-col>
-                    </ion-row>
-                    <br v-if="!isLogin"/>
-                    <ion-input shape="round" fill="outline" label-placement="floating" label="Email" v-model="email" type="email" required></ion-input>
-                    <br/> 
-                    <ion-input shape="round" fill="outline" label-placement="floating" label="Password" type="password" v-model="password" required :error-text="error"></ion-input>
-                    <br/> 
+                <ion-row v-if="!isLogin">
+                  <ion-col style="padding-left:0;">
+                    <ion-input shape="round" fill="outline" label-placement="floating" label="First Name" v-model="firstName" required></ion-input>
+                  </ion-col>
+                  <ion-col style="padding-right:0;">
+                    <ion-input shape="round" fill="outline" label-placement="floating" label="Last Name" v-model="lastName" required></ion-input>
+                  </ion-col>
+                </ion-row>
+                <br/>
+                <ion-input shape="round" fill="outline" label-placement="floating" label="Email" v-model="email" type="email" required></ion-input>
+                <br/> 
+                <ion-input shape="round" fill="outline" label-placement="floating" label="Password" type="password" v-model="password" required :error-text="error"></ion-input>
+                <br/> 
 
-                    <ion-button size="large" shape="round" expand="full" :disabled="isSubmitting" @click="handleSubmit">
-                      Continue
-                    </ion-button>
-                    <br/> 
-                    <!-- <ion-text color="danger" v-if="error" class="ion-text-center">{{ error }}</ion-text> -->
+                <ion-button size="large" shape="round" expand="full" :disabled="isSubmitting" @click="handleSubmit">
+                  Continue
+                </ion-button>
+                <br/> 
+                <!-- <ion-text color="danger" v-if="error" class="ion-text-center">{{ error }}</ion-text> -->
 
-                    <div class="align-items">
-                      <ion-text>{{ isLogin ? "Don't have an account? " : 'Already a member? ' }}</ion-text>
-                      <ion-button size="small" shape="round" @click="toggleAuth" fill="clear">
-                        {{ isLogin ? 'Sign up' : 'Login' }}
-                      </ion-button>
-                    </div>   
+                <div class="align-items">
+                  <ion-text>{{ isLogin ? "Don't have an account? " : 'Already a member? ' }}</ion-text>
+                  <ion-button size="small" shape="round" @click="toggleAuth" fill="clear">
+                    {{ isLogin ? 'Sign up' : 'Login' }}
+                  </ion-button>
+                </div>   
               </ion-card-content>
             </ion-card>
           </ion-col>
@@ -59,8 +59,8 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { useStore } from 'vuex';
 import { useIonRouter } from '@ionic/vue';
+import { useMainStore } from '../store';
 import {
   IonContent,
   IonPage,
@@ -100,7 +100,7 @@ export default defineComponent({
     IonList,
   },
   setup() {
-    const store = useStore();
+    const store = useMainStore();
     const router = useIonRouter();
 
     const password = ref('');
@@ -119,6 +119,7 @@ export default defineComponent({
         let response;
         if (isLogin.value) {
           const loginData: LoginRequest = { email: email.value, password: password.value };
+          console.log(loginData)
           response = await authModel.api.login(loginData);
         } else {
           const registerData: RegisterRequest = {
@@ -130,8 +131,8 @@ export default defineComponent({
           response = await authModel.api.register(registerData);
         }
 
-        store.commit('setAuth', true);
-        store.commit('setUser', response.user);
+        store.setAuth(true);
+        store.setUser(response.user);
 
         router.push('/home');
       } catch (e) {

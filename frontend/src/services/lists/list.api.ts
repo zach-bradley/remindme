@@ -28,12 +28,12 @@ export class ListApi {
         return headers;
     }
 
-    async getList(id: string): Promise<List> {
+    async getList(id: String): Promise<List> {
         const getListQuery = queryBase(
             "getList",
             "list",
             ["id", "name", "place", "userId", "items { id name quantity checked }"],
-            { id: "UUID!" }
+            { id: {type:"String!",value:id} }
         );
 
         const response = await fetch(this.baseUrl, {
@@ -49,12 +49,12 @@ export class ListApi {
         return data.data.list;
     }
 
-    async getLists(userId: string): Promise<List[]> {
+    async getLists(id: string): Promise<List[]> {
         const getListsQuery = queryBase(
             "getLists",
             "lists",
             ["id", "name", "place", "userId", "items { id name quantity checked }"],
-            { user_id: "String!" }
+            { id: {type: "String!",  value: id}}
         );
 
         const response = await fetch(this.baseUrl, {
@@ -62,7 +62,7 @@ export class ListApi {
             headers: this.getHeaders(),
             body: JSON.stringify({
                 query: getListsQuery,
-                variables: { user_id: userId }
+                variables: { id: id }
             })
         });
 

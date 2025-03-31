@@ -30,6 +30,7 @@ class User(TimeStampModel):
     
     def client_dict(self):
         user = model_to_dict(self,UserType)
+        print(user)
         user["location"] = UserLocationType(**user["location"])
         return user
     
